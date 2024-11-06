@@ -25,7 +25,7 @@ public class Application {
             return;
         }
 
-        System.out.println("conexao estabelecida com sucesso!");
+        System.out.println("conexao estabelecida com sucesso");
 
         ProductManager manager = new ProductManager(user, password);
 
