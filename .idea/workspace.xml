@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a0554f33-81e7-4909-a1ee-a3ea09aefc25" name="Changes" comment="">
+    <list default="true" id="a0554f33-81e7-4909-a1ee-a3ea09aefc25" name="Changes" comment="requisicao de usuario e senha para a entrada no banco de dados.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/connectToDb/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/connectToDb/DatabaseConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Application.java" afterDir="false" />
@@ -26,6 +26,12 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "itowaka044"
+  }
+}]]></component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/itowaka044/stock-controller.git",
@@ -70,6 +76,15 @@
       <option name="presentableId" value="Default" />
       <updated>1730496055979</updated>
     </task>
+    <task id="LOCAL-00001" summary="requisicao de usuario e senha para a entrada no banco de dados.">
+      <option name="closed" value="true" />
+      <created>1730919944905</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1730919944905</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -94,5 +109,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="requisicao de usuario e senha para a entrada no banco de dados." />
+    <option name="LAST_COMMIT_MESSAGE" value="requisicao de usuario e senha para a entrada no banco de dados." />
   </component>
 </project>

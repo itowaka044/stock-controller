@@ -1,7 +1,6 @@
 package manager;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,54 +10,23 @@ import static connectToDb.DatabaseConnection.getConnection;
 
 public class ProductManager {
 
-    private String user;
-    private String password;
+    private final String user;
+    private final String password;
 
     public ProductManager(String user, String password) {
         this.user = user;
         this.password = password;
     }
 
-    public void createDatabaseAndTable() {
-        String DB_NAME = "product_db";
-        String TABLE_NAME = "products";
+    public void addProduct(Connection conn, String name, String type, double price, String brand) {
+        String sql = "INSERT INTO products (name, type, price, brand) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", user, password);
-             Statement stmt = conn.createStatement()) {
-
-            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DB_NAME);
-            System.out.println("Banco de dados '" + DB_NAME + "' verificado/criado.");
-
-        } catch (SQLException e) {
-            System.out.println("Falha ao criar o banco de dados: " + e.getMessage());
-        }
-
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + DB_NAME, user, password);
-             Statement stmt = conn.createStatement()) {
-
-            String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
-                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                    "name VARCHAR(100) NOT NULL, " +
-                    "type VARCHAR(100) NOT NULL, " +
-                    "price DECIMAL(10, 2) NOT NULL" +
-                    ")";
-            stmt.executeUpdate(sql);
-            System.out.println("Tabela '" + TABLE_NAME + "' verificada/criada.");
-
-        } catch (SQLException e) {
-            System.out.println("Falha ao conectar ou criar a tabela: " + e.getMessage());
-        }
-    }
-
-    public void addProduct(String name, String type, double price) {
-        String sql = "INSERT INTO products (name, type, price) VALUES (?, ?, ?)";
-
-        try (Connection conn = getConnection(user, password);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, name);
             pstmt.setString(2, type);
             pstmt.setDouble(3, price);
+            pstmt.setString(4, brand);
 
             pstmt.executeUpdate();
 
@@ -152,7 +120,7 @@ public class ProductManager {
             } else {
                 while (rs.next()) {
                     System.out.println("ID: " + rs.getInt("id") + ", nome: " +
-                            rs.getString("name") + ", preço: R$" + rs.getDouble("price"));
+                            rs.getString("name") + ", preço: R$" + rs.getDouble("price") + ", marca: " + rs.getString("brand"));
                 }
             }
 
