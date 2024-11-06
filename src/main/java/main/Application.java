@@ -1,13 +1,32 @@
 package main;
 
-import manager.ProductManager;
-
+import java.sql.Connection;
 import java.util.Scanner;
+
+import connectToDb.DatabaseConnection;
+import manager.ProductManager;
 
 public class Application {
     public static void main(String[] args) {
-        ProductManager manager = new ProductManager();
         Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Informe o nome de usuário do banco de dados: ");
+        String user = scanner.nextLine();
+
+        System.out.print("Informe a senha do banco de dados: ");
+        String password = scanner.nextLine();
+
+        Connection connection = DatabaseConnection.getConnection(user, password);
+
+        if (connection != null) {
+            System.out.println("Conexão estabelecida com sucesso!");
+
+            DatabaseConnection.closeConnection();
+        } else {
+            System.out.println("Não foi possível estabelecer a conexão.");
+        }
+
+        ProductManager manager = new ProductManager(user, password);
 
         manager.createDatabaseAndTable();
 

@@ -1,27 +1,40 @@
 package manager;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import static connectToDb.DatabaseConnection.*;
+import static connectToDb.DatabaseConnection.getConnection;
 
 public class ProductManager {
 
-    public static void createDatabaseAndTable() {
-        Connection conn = null;
-        Statement stmt = null;
+    private String user;
+    private String password;
+
+    public ProductManager(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
+
+    public void createDatabaseAndTable() {
         String DB_NAME = "product_db";
         String TABLE_NAME = "products";
 
-        try {
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", USER, PASSWORD);
-            stmt = conn.createStatement();
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", user, password);
+             Statement stmt = conn.createStatement()) {
 
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + DB_NAME);
+            System.out.println("Banco de dados '" + DB_NAME + "' verificado/criado.");
 
-            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Falha ao criar o banco de dados: " + e.getMessage());
+        }
 
-            conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            stmt = conn.createStatement();
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + DB_NAME, user, password);
+             Statement stmt = conn.createStatement()) {
 
             String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -30,23 +43,17 @@ public class ProductManager {
                     "price DECIMAL(10, 2) NOT NULL" +
                     ")";
             stmt.executeUpdate(sql);
+            System.out.println("Tabela '" + TABLE_NAME + "' verificada/criada.");
 
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Falha ao conectar ou criar a tabela: " + e.getMessage());
         }
     }
 
     public void addProduct(String name, String type, double price) {
         String sql = "INSERT INTO products (name, type, price) VALUES (?, ?, ?)";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = getConnection(user, password);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, name);
@@ -55,7 +62,7 @@ public class ProductManager {
 
             pstmt.executeUpdate();
 
-            System.out.println("\nproduto adicionado.\n");
+            System.out.println("\nproduto adicionado.");
 
         } catch (SQLException e) {
             System.out.println("\nerro ao adicionar produto: " + e.getMessage());
@@ -63,7 +70,7 @@ public class ProductManager {
     }
 
     public void listProducts(String sql) {
-        try (Connection conn = getConnection();
+        try (Connection conn = getConnection(user, password);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -84,7 +91,7 @@ public class ProductManager {
     public void updateProduct(int id, String name, double price, String type) {
         String sql = "UPDATE products SET name = ?, price = ?, type = ? WHERE id = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = getConnection(user, password);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, name);
@@ -108,7 +115,7 @@ public class ProductManager {
     public void deleteProduct(int id) {
         String sql = "DELETE FROM products WHERE id = ?";
 
-        try (Connection conn = getConnection();
+        try (Connection conn = getConnection(user, password);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
@@ -136,7 +143,7 @@ public class ProductManager {
     }
 
     public void filterProducts(String sql) {
-        try (Connection conn = getConnection();
+        try (Connection conn = getConnection(user, password);
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
