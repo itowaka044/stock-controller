@@ -1,14 +1,13 @@
 package main;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Scanner;
 
 import connectToDb.DatabaseConnection;
 import manager.ProductManager;
 
 public class Application {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
         DatabaseConnection dbConn = new DatabaseConnection();
 
