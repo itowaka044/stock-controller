@@ -33,7 +33,7 @@ public class Application {
             int typeDecision;
             String productType;
 
-            System.out.printf("\nescolha uma opção:\n" +
+            System.out.printf("\nescolha uma opcao:\n" +
                     "1. adicionar produto\n" +
                     "2. listar produtos\n" +
                     "3. atualizar produto\n" +
