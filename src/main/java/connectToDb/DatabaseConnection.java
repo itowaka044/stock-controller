@@ -1,75 +1,90 @@
 package connectToDb;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class DatabaseConnection {
     private static final String dbName = "product_db";
     private static final String url = "jdbc:mysql://localhost:3306/";
     private static final String tableName = "products";
-
-    private static Connection connection = null;
+    private static String user;
+    private static String password;
+    private static HikariDataSource dataSource;
 
     public DatabaseConnection() {
     }
 
-    public Connection createDatabaseAndTable(String user, String password) {
-        Connection conn = null;
+    public void setUser(String user) {
+        this.user = user;
+        resetDataSource();
+    }
 
-        try {
-            conn = DriverManager.getConnection(url, user, password);
-            Statement stmt = conn.createStatement();
+    public void setPassword(String password) {
+        this.password = password;
+        resetDataSource();
+    }
 
-            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS " + dbName);
-            System.out.println("banco de dados '" + dbName + "' verificado/criado.");
-            stmt.close();
+    private static void resetDataSource() {
+        if (dataSource != null) {
+            dataSource.close();
+        }
 
-            conn = DriverManager.getConnection(url+dbName, user, password);
-            stmt = conn.createStatement();
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url + dbName);
+        config.setUsername(user);
+        config.setPassword(password);
 
-            String sql ="CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-                        "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                        "name VARCHAR(250) NOT NULL, " +
-                        "type VARCHAR(250) NOT NULL, " +
-                        "price DECIMAL(10, 2) NOT NULL," +
-                        "brand VARCHAR(250) NOT NULL" +
-                        ")";
-            stmt.executeUpdate(sql);
-            System.out.println("tabela '" + tableName + "' verificada/criada.");
-            stmt.close();
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(2);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
+
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        dataSource = new HikariDataSource(config);
+    }
+
+    public static Connection getConnection() throws SQLException {
+        if (dataSource == null) {
+            throw new IllegalStateException("DataSource não foi inicializado. Configure o usuário e a senha primeiro.");
+        }
+        return dataSource.getConnection();
+    }
+
+    public void createDatabaseAndTable() {
+        String createDatabaseSQL = "CREATE DATABASE IF NOT EXISTS " + dbName;
+        String useDatabaseSQL = "USE " + dbName;
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
+                "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                "name VARCHAR(250) NOT NULL, " +
+                "type VARCHAR(250) NOT NULL, " +
+                "price DECIMAL(10, 2) NOT NULL," +
+                "brand VARCHAR(250) NOT NULL" +
+                ")";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            stmt.executeUpdate(createDatabaseSQL);
+            stmt.executeUpdate(useDatabaseSQL);
+            stmt.executeUpdate(createTableSQL);
+
+            System.out.println("Banco de dados e tabela criados com sucesso.");
 
         } catch (SQLException e) {
-            System.out.println("Falha ao criar o banco de dados: " + e.getMessage());
-            return null;
+            System.out.println("Erro ao criar banco de dados e tabela: " + e.getMessage());
         }
-
-        return conn;
     }
 
-    public static Connection getConnection(String user, String password) {
-        if (connection == null) {
-            try {
-                connection = DriverManager.getConnection(url, user, password);
-                System.out.println("Conexão com o banco de dados estabelecida.");
-            } catch (SQLException e) {
-                System.err.println("Falha ao conectar ao banco de dados: " + e.getMessage());
-            }
-        }
-        return connection;
-    }
-
-    public static void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-                System.out.println("Conexão com o banco de dados fechada.");
-            } catch (SQLException e) {
-                System.err.println("Erro ao fechar a conexão: " + e.getMessage());
-            } finally {
-                connection = null;
-            }
+    public static void closeDataSource() {
+        if (dataSource != null) {
+            dataSource.close();
         }
     }
 }

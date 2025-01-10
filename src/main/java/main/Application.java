@@ -1,106 +1,59 @@
 package main;
 
-import java.sql.Connection;
-import java.util.Scanner;
-
 import connectToDb.DatabaseConnection;
 import manager.ProductManager;
+import java.util.Scanner;
 
 public class Application {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
         DatabaseConnection dbConn = new DatabaseConnection();
 
-        System.out.print("user do banco de dados: ");
+        System.out.print("Usuário: ");
         String user = scanner.nextLine();
 
-        System.out.print("senha do banco de dados: ");
+        System.out.print("Senha: ");
         String password = scanner.nextLine();
 
-        Connection conn = dbConn.createDatabaseAndTable(user, password);
+        dbConn.setUser(user);
+        dbConn.setPassword(password);
 
-        if(conn == null){
-            System.out.println("nao foi possivel estabelecer conexao");
-            scanner.close();
-            return;
-        }
+        dbConn.createDatabaseAndTable();
 
-        System.out.println("conexao estabelecida com sucesso");
-
-        ProductManager manager = new ProductManager(user, password);
+        ProductManager manager = new ProductManager();
 
         while (true) {
-            int typeDecision;
-            String productType;
-
-            System.out.printf("\nescolha uma opcao:\n" +
-                    "1. adicionar produto\n" +
-                    "2. listar produtos\n" +
-                    "3. atualizar produto\n" +
-                    "4. excluir produto\n" +
-                    "5. ordenar por preço (ascendente)\n"+
-                    "6. ordenar por preço (descendente)\n" +
-                    "7. filtrar\n" +
-                    "8. sair\n");
-            System.out.print("opção: ");
+            System.out.printf("\nEscolha uma opção:\n" +
+                    "1. Adicionar produto\n" +
+                    "2. Listar produtos\n" +
+                    "3. Atualizar produto\n" +
+                    "4. Excluir produto\n" +
+                    "5. Filtrar produtos\n" +
+                    "6. Sair\n");
+            System.out.print("Opção: ");
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option > 8 || option < 1) {
-                System.out.println("valor inválido");
-                continue;
-            }
-
             switch (option) {
                 case 1:
-                    System.out.print("nome: ");
+                    System.out.print("Nome: ");
                     String productName = scanner.nextLine();
-                    productName = productName.toLowerCase();
 
-                    System.out.println("tipo:\n" +
-                            "1. alimentos e bebidas\n" +
-                            "2. produtos de higiene\n" +
-                            "3. produtos de limpeza\n" +
-                            "4. cosmeticos e cuidados pessoais\n" +
-                            "5. eletro\n" +
-                            "6. papelaria e utensilios\n" +
-                            "7. roupas e acessorios\n" +
-                            "8. pet shop ");
-                    typeDecision = scanner.nextInt();
-                    scanner.nextLine();
+                    System.out.print("Tipo: ");
+                    String productType = scanner.nextLine();
 
-                    productType = null;
-
-                    if (typeDecision >= 1 && typeDecision <= 8) {
-                        switch (typeDecision) {
-                            case 1: productType = "alimentos e bebidas"; break;
-                            case 2: productType = "produtos de higiene"; break;
-                            case 3: productType = "produtos de limpeza"; break;
-                            case 4: productType = "cosmeticos e cuidados pessoais"; break;
-                            case 5: productType = "eletro"; break;
-                            case 6: productType = "papelaria e utensilios"; break;
-                            case 7: productType = "roupas e acessorios"; break;
-                            case 8: productType = "pet shop"; break;
-                        }
-                    } else {
-                        System.out.println("tipo invalido");
-                        break;
-                    }
-
-                    System.out.print("preço: ");
+                    System.out.print("Preço: ");
                     double productPrice = scanner.nextDouble();
                     scanner.nextLine();
 
-                    System.out.print("marca: ");
+                    System.out.print("Marca: ");
                     String productBrand = scanner.nextLine();
-                    productBrand = productBrand.toLowerCase();
 
-                    manager.addProduct(conn, productName, productType, productPrice, productBrand);
+                    manager.addProduct(productName, productType, productPrice, productBrand);
                     break;
 
                 case 2:
-                    String sql = "SELECT * FROM products";
-                    manager.listProducts(sql);
+                    manager.listProducts();
                     break;
 
                 case 3:
@@ -108,44 +61,17 @@ public class Application {
                     int updateId = scanner.nextInt();
                     scanner.nextLine();
 
-                    System.out.print("novo nome: ");
+                    System.out.print("Novo nome: ");
                     String newName = scanner.nextLine();
 
-                    System.out.println("tipo:\n" +
-                            "1. alimentos e bebidas\n" +
-                            "2. produtos de higiene\n" +
-                            "3. produtos de limpeza\n" +
-                            "4. cosmeticos e cuidados pessoais\n" +
-                            "5. eletro\n" +
-                            "6. papelaria e utensilios\n" +
-                            "7. roupas e acessorios\n" +
-                            "8. pet shop ");
-                    typeDecision = scanner.nextInt();
-                    scanner.nextLine();
+                    System.out.print("Novo tipo: ");
+                    String newType = scanner.nextLine();
 
-                    productType = null;
-
-                    if (typeDecision >= 1 && typeDecision <= 8) {
-                        switch (typeDecision) {
-                            case 1: productType = "alimentos e bebidas"; break;
-                            case 2: productType = "produtos de higiene"; break;
-                            case 3: productType = "produtos de limpeza"; break;
-                            case 4: productType = "cosmeticos e cuidados pessoais"; break;
-                            case 5: productType = "eletro"; break;
-                            case 6: productType = "papelaria e utensilios"; break;
-                            case 7: productType = "roupas e acessorios"; break;
-                            case 8: productType = "pet shop"; break;
-                        }
-                    } else {
-                        System.out.println("tipo invalido");
-                        break;
-                    }
-
-                    System.out.print("novo preço: ");
+                    System.out.print("Novo preço: ");
                     double newPrice = scanner.nextDouble();
                     scanner.nextLine();
 
-                    manager.updateProduct(updateId, newName, newPrice, productType);
+                    manager.updateProduct(updateId, newName, newPrice, newType);
                     break;
 
                 case 4:
@@ -154,52 +80,20 @@ public class Application {
                     manager.deleteProduct(deleteId);
                     break;
 
-                case 5: manager.orderAsc(); break;
-
-                case 6: manager.orderDesc(); break;
-
-                case 7:
-                    System.out.println("tipo:\n" +
-                            "1. alimentos e bebidas\n" +
-                            "2. produtos de higiene\n" +
-                            "3. produtos de limpeza\n" +
-                            "4. cosmeticos e cuidados pessoais\n" +
-                            "5. eletro\n" +
-                            "6. papelaria e utensilios\n" +
-                            "7. roupas e acessorios\n" +
-                            "8. pet shop ");
-                    typeDecision = scanner.nextInt();
-                    scanner.nextLine();
-
-                    productType = null;
-
-                    if (typeDecision >= 1 && typeDecision <= 8) {
-                        switch (typeDecision) {
-                            case 1: productType = "SELECT * FROM products WHERE type= 'alimentos e bebidas'"; break;
-                            case 2: productType = "SELECT * FROM products WHERE type= 'produtos de higiene'"; break;
-                            case 3: productType = "SELECT * FROM products WHERE type= 'produtos de limpeza'"; break;
-                            case 4: productType = "SELECT * FROM products WHERE type= 'cosmeticos e cuidados pessoais'"; break;
-                            case 5: productType = "SELECT * FROM products WHERE type= 'eletro'"; break;
-                            case 6: productType = "SELECT * FROM products WHERE type= 'papelaria e utensilios'"; break;
-                            case 7: productType = "SELECT * FROM products WHERE type= 'roupas e acessorio's'"; break;
-                            case 8: productType = "SELECT * FROM products WHERE type= 'pet shop'"; break;
-                        }
-                    } else {
-                        System.out.println("tipo invalido");
-                        break;
-                    }
-
-                    manager.filterProducts(productType);
+                case 5:
+                    System.out.print("Digite o tipo de produto para filtrar (ex: 'alimentos e bebidas'): ");
+                    String filterType = scanner.nextLine();
+                    String filterQuery = "SELECT * FROM products WHERE type = '" + filterType + "'";
+                    manager.listFilteredProducts(filterQuery);
                     break;
 
-                case 8:
-                    System.out.println("finalizado.");
+                case 6:
+                    System.out.println("Finalizado.");
                     scanner.close();
-                    DatabaseConnection.closeConnection();
                     return;
 
                 default:
-                    System.out.println("opção inválida.");
+                    System.out.println("Opção inválida.");
             }
         }
     }
