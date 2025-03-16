@@ -1,26 +1,17 @@
-package main;
+package app;
 
-import connectToDb.DatabaseConnection;
+import repositories.DatabaseConnection;
 import manager.ProductManager;
 import java.util.Scanner;
 
-public class Application {
+public class Main {
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
-        DatabaseConnection dbConn = new DatabaseConnection();
+        DatabaseConnection databaseConnection = new DatabaseConnection();
 
-        System.out.print("Usuário: ");
-        String user = scanner.nextLine();
+        databaseConnection.createDatabaseAndTable();
 
-        System.out.print("Senha: ");
-        String password = scanner.nextLine();
-
-        dbConn.setUser(user);
-        dbConn.setPassword(password);
-
-        dbConn.createDatabaseAndTable();
-
-        ProductManager manager = new ProductManager();
+        ProductManager productManager = new ProductManager();
 
         while (true) {
             System.out.printf("\nEscolha uma opção:\n" +
@@ -49,11 +40,11 @@ public class Application {
                     System.out.print("Marca: ");
                     String productBrand = scanner.nextLine();
 
-                    manager.addProduct(productName, productType, productPrice, productBrand);
+                    productManager.addProduct(productName, productType, productPrice, productBrand);
                     break;
 
                 case 2:
-                    manager.listProducts();
+                    productManager.listProducts();
                     break;
 
                 case 3:
@@ -71,20 +62,20 @@ public class Application {
                     double newPrice = scanner.nextDouble();
                     scanner.nextLine();
 
-                    manager.updateProduct(updateId, newName, newPrice, newType);
+                    productManager.updateProduct(updateId, newName, newPrice, newType);
                     break;
 
                 case 4:
                     System.out.print("ID do produto para excluir: ");
                     int deleteId = scanner.nextInt();
-                    manager.deleteProduct(deleteId);
+                    productManager.deleteProduct(deleteId);
                     break;
 
                 case 5:
                     System.out.print("Digite o tipo de produto para filtrar (ex: 'alimentos e bebidas'): ");
                     String filterType = scanner.nextLine();
                     String filterQuery = "SELECT * FROM products WHERE type = '" + filterType + "'";
-                    manager.listFilteredProducts(filterQuery);
+                    productManager.listFilteredProducts(filterQuery);
                     break;
 
                 case 6:

@@ -1,6 +1,6 @@
 package manager;
 
-import connectToDb.DatabaseConnection;
+import repositories.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ProductManager {
+
+    private static final String url = "jdbc:mysql://localhost:3306/";
+    private static final String user = "root";
+    private static final String password = "1234";
 
     public void addProduct(String name, String type, double price, String brand) {
         String sql = "INSERT INTO products (name, type, price, brand) VALUES (?, ?, ?, ?)";
